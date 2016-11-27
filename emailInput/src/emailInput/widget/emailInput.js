@@ -92,18 +92,12 @@ define([
 
         postCreate: function () {
             logger.debug(this.id + ".postCreate");
-            // Create the widget DOM
-            this._widgetConstructor();
-            this._labelConstructor();
-
-
-            this.domNode.appendChild(_widgetNode);
-            this._updateRendering(callback);
         },
 
         update: function (obj, callback) {
             logger.debug(this.id + ".update");
             this._contextObj = obj;
+            this._resetSubscriptions();
             this._updateRendering(callback);
         },
 
@@ -113,15 +107,20 @@ define([
 
         uninitialize: function () {
             logger.debug(this.id + ".uninitialize");
+            destroy(this._widgetNode);
         },
 
         _updateRendering: function (callback) {
             logger.debug(this.id + "._updateRendering");
-
             if (this._contextObj !== null) {
-                dojoStyle.set(this.domNode, "display", "block");
+                // Create the widget DOM
+                this._widgetConstructor();
+                this._labelConstructor();
+                this._inputAddonConstructor();
+                this._inputConstructor();
             } else {
-                dojoStyle.set(this.domNode, "display", "none");
+                // If no context for widget destroy all elements
+                destroy(this._widgetNode);
             }
             // Clear the validation messages on update of the widget
             this._clearValidations();
@@ -179,16 +178,16 @@ define([
                 this._addonNode = null;
         },
 
-        _inputConstructor: function(){
+        _inputConstructor: function() {
             var inputTarget = null;
             var insertLocation = "";
             var description = "";
 
-            if (!this.inputAddon == "disabledInputGroupAddon"){
+            if (!this.inputAddon == "disabledInputGroupAddon") {
                 inputTarget = this._addonNode;
                 insertLocation = "after";
             } else {
-                if (this.displayLabel){
+                if (this.displayLabel) {
                     inputTarget = this._labelNode;
                     insertLocation = "after";
                 } else {
@@ -197,8 +196,13 @@ define([
                 }
             }
 
-            create(
-                "input", {
+            if (this.showInputHelper) {
+                description = this.labelText + " " + this.inputHelper
+            } else {
+                description = this.labelText
+            }
+
+            create("input", {
                     "class": "form-control",
                     "id": this._uid + "-input",
                     "type": "email",
@@ -208,6 +212,10 @@ define([
                     "value": this.emailAddress,
                 }, inputTarget, insertLocation
             )
+        },
+
+        _inputHelperConstructor: function(){
+
         },
 
         // Generic functionality for showing validation messages to the user
