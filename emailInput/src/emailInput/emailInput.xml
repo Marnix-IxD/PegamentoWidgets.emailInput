@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<widget id="emailInput.widget.emailInput" needsEntityContext="true" xmlns="http://www.mendix.com/widget/1.0/">
+    <name>emailInput</name>
+    <description>The description of this widget.</description>
+
+    <icon />
+    <properties>
+        <property key="email" type="entity" required="true" allowNonPersistableEntities="true" isPath="optional" pathType="reference">
+            <caption>Email entity</caption>
+            <category>Data source</category>
+            <description>The e-mail entity to use.</description>
+        </property>
+
+        <property key="constraint" type="entityConstraint" entityProperty="email" required="false">
+            <caption>Constraint on email entity</caption>
+            <category>Data source</category>
+            <description>The xpath constraint on the e-mail entity.</description>
+        </property>
+
+        <property key="emailAddress" type="attribute" required="true" entityProperty="email">
+            <caption>Email address</caption>
+            <category>Data source</category>
+            <description>The attribute in which the e-mail address is stored</description>
+            <attributeTypes>
+                <attributeType name="String" />
+            </attributeTypes>
+        </property>
+
+        <property key="showInputHelper" type="attribute" required="false" entityProperty="email">
+            <caption>Show helper text</caption>
+            <category>Data source</category>
+            <description>Set the visibility of the helper text based on an attribute</description>
+            <attributeTypes>
+                <attributeType name="Boolean" />
+            </attributeTypes>
+        </property>
+
+        <property key="inputHelper" type="attribute" required="false" entityProperty="email">
+            <caption>Helper text</caption>
+            <category>Data source</category>
+            <description>Allows for setting a dynamic helper text for the input field</description>
+            <attributeTypes>
+                <attributeType name="String"/>
+            </attributeTypes>
+        </property>
+
+        <property key="verificationRequired" type="boolean" defaultValue="true">
+            <caption>Verification required</caption>
+            <category>Verification</category>
+            <description>Require the user to enter a verification code sent in the test email</description>
+        </property>
+
+        <property key="sendEmailVerificationButtonText" type="translatableString" required="false">
+            <caption>Send button caption</caption>
+            <category>Verification</category>
+            <description>Enter a button caption for the send verification button</description>
+            <translations>
+                <translation lang="en_US">Send verification code</translation>
+                <translation lang="nl_NL">Stuur verificatie code</translation>
+                <translation lang="de_DE">Bestätigungscode senden</translation>
+                <translation lang="fr_FR">Envoyer le code de validation</translation>
+                <translation lang="es_ES">Envíe el código de verificación</translation>
+            </translations>
+        </property>
+
+        <property key="sendEmailVerificationMicroflow" type="microflow" required="false">
+            <caption>Send a test email</caption>
+            <category>Verification</category>
+            <description>Add a microflow that sends a validation message to the given email</description>
+            <returnType type="Boolean" />
+        </property>
+
+        <property key="verificationCode" type="attribute" required="false" entityProperty="email">
+            <caption>Verification code</caption>
+            <category>Verification</category>
+            <description>The attribute in which the verification code is added, input will be displayed after the verification code was sent to the given email</description>
+            <attributeTypes>
+                <attributeType name="String" />
+                <attributeType name="Integer" />
+                <attributeType name="Long" />
+                <attributeType name="HashString" />
+                <attributeType name="Decimal" />
+            </attributeTypes>
+        </property>
+
+        <property key="verifyEmailMicroflow" type="microflow" required="false">
+            <caption>Verify e-mail microflow</caption>
+            <category>Verification</category>
+            <description>Add a microflow that will be triggered when the verification code is added by the test email recipient</description>
+            <returnType type="String" />
+        </property>
+
+        <property key="verificationHelper" type="translatableString" required="false" multiline="true">
+            <caption>Helper text</caption>
+            <category>Verification</category>
+            <description>Allows for setting a helper text for the verification code field, will be displayed after the verification code was sent to the given email</description>
+            <translations>
+                <translation lang="en_US">Please check your email inbox, we've just sent you an email containing a verification code.</translation>
+                <translation lang="nl_NL">Controleer a.u.b. uw inbox, we hebben u zojuist een email gestuurd met daarin een verificatiecode.</translation>
+                <translation lang="de_DE">Bitte überprüfen Sie Ihre E-Mail-Posteingang, wir haben Ihnen eine E-Mail mit einem Bestätigungscode gesandt.</translation>
+                <translation lang="fr_FR">Veuillez vérifier votre boîte de réception, nous venons de vous envoyer un courriel contenant un code de vérification.</translation>
+                <translation lang="es_ES">Revisa tu buzón de correo electrónico, acabamos de enviarte un correo electrónico con un código de verificación.</translation>
+            </translations>
+        </property>
+
+        <property key="verified" type="attribute" required="false" entityProperty="email">
+            <caption>Verified</caption>
+            <category>Verification</category>
+            <description>The attribute that toggles when the email has been verified</description>
+            <attributeTypes>
+                <attributeType name="Boolean" />
+            </attributeTypes>
+        </property>
+
+        <property key="formOrientation" type="enumeration" defaultValue="horizontal">
+            <caption>Form orientation</caption>
+            <category>Appearance</category>
+            <description>Select the orientation for the form</description>
+            <enumerationValues>
+                <enumerationValue key="horizontal">Horizontal</enumerationValue>
+                <enumerationValue key="vertical">Vertical</enumerationValue>
+            </enumerationValues>
+        </property>
+
+        <property key="displayLabel" type="boolean" defaultValue="true">
+            <caption>Show Label</caption>
+            <category>Appearance</category>
+            <description>Show a label for the field.</description>
+        </property>
+
+        <property key="labelText" type="translatableString" required="true">
+            <caption>Label caption</caption>
+            <category>Appearance</category>
+            <description>Enter a label caption for the input field, this text is used for the label / title / ARIA description of the input field.</description>
+            <translations>
+                <translation lang="en_US">Email</translation>
+                <translation lang="nl_NL">E-mail</translation>
+                <translation lang="de_DE">Email</translation>
+                <translation lang="fr_FR">Email</translation>
+                <translation lang="es_ES">Correo electrónico</translation>
+            </translations>
+        </property>
+
+        <property key="labelWidth" type="string" required="false" defaultValue="col-xs-3 col-sm-3 col-md-3 col-lg-3 col-xl-3">
+            <caption>Label classes</caption>
+            <category>Appearance</category>
+            <description>The column size of the label control (only used when input is rendered horizontally, otherwise uses 100% width)</description>
+        </property>
+
+        <property key="inputAddon" type="enumeration" required="true" defaultValue="disabledInputGroupAddon">
+            <caption>Add-on style</caption>
+            <category>Appearance</category>
+            <description>Choose a style for an input add-on (only displayed when the input is rendered horizontally)</description>
+            <enumerationValues>
+                <enumerationValue key="iconInputGroupAddon">Input icon add-on</enumerationValue>
+                <enumerationValue key="textInputGroupAddon">Input text add-on</enumerationValue>
+                <enumerationValue key="disabledInputGroupAddon">None</enumerationValue>
+            </enumerationValues>
+        </property>
+
+        <property key="inputAddonText" type="translatableString" required="false">
+            <caption>Add-on caption</caption>
+            <category>Appearance</category>
+            <description>Enter the caption for the input add-on (only displayed when the input add-on style is set to text)</description>
+            <translations>
+                <translation lang="en_US">Email</translation>
+                <translation lang="nl_NL">E-mail</translation>
+                <translation lang="de_DE">Email</translation>
+                <translation lang="fr_FR">Email</translation>
+                <translation lang="es_ES">Correo electrónico</translation>
+            </translations>
+        </property>
+
+        <property key="inputAddonWidth" type="string" required="false" defaultValue="col-xs-3 col-sm-3 col-md-3 col-lg-3 col-xl-3">
+            <caption>Add-on classes</caption>
+            <category>Appearance</category>
+            <description>The column size of the add-on (only displayed when input is rendered horizontally)</description>
+        </property>
+
+        <property key="inputWidth" type="string" required="false" defaultValue="col-xs-9 col-sm-9 col-md-9 col-lg-9 col-xl-9">
+            <caption>Input classes</caption>
+            <category>Appearance</category>
+            <description>The column size of the input field. This value can be used to overwrite the field width. By default the input width will be calculated based on the form orientation, the label width and display of a validation button. If the combined width of these is to large form orientation will automatically change to vertical.</description>
+        </property>
+
+        <property key="placeholderText" type="translatableString" required="false">
+            <caption>Placeholder text</caption>
+            <category>Appearance</category>
+            <description>Enter a placeholder text for the input field. Leave this field empty if you don't want it rendered.</description>
+            <translations>
+                <translation lang="en_US">Enter your email address</translation>
+                <translation lang="nl_NL">Vul uw e-mailadres in</translation>
+                <translation lang="de_DE">Geben sie ihre E-Mailadresse ein</translation>
+                <translation lang="fr_FR">Entrez votre adresse email</translation>
+                <translation lang="es_ES">Ingrese su dirección de correo electrónico</translation>
+            </translations>
+        </property>
+
+        <property key="toLowerCase" type="boolean" required="true" defaultValue="true">
+            <caption>Lowercase by default</caption>
+            <category>Validation</category>
+            <description>Automatically transform the input of the widget to lowercase</description>
+        </property>
+
+        <property key="maxLength" type="integer" required="true" defaultValue="320">
+            <caption>Maximum length e-mail</caption>
+            <category>Validation</category>
+            <description>The maximum length of the e-mail address</description>
+        </property>
+
+        <property key="translatableLengthValidationMessage" type="translatableString" multiline="true">
+            <caption>Max length exceeded</caption>
+            <category>Validation</category>
+            <description>Enter a validation message for when the maximum length of the e-mail address is exceeded</description>
+            <translations>
+                <translation lang="en_US">The maximum number of characters for an email address was exceeded.</translation>
+                <translation lang="nl_NL">Het maximum aantal karakters voor een e-mail adres is overschreden.</translation>
+                <translation lang="de_DE">Die höchstanzahl Charaktere für eine Email-Addresse ist überschritten.</translation>
+                <translation lang="fr_FR">Le nombre maximal de caractères d'une adresse e-mail a été dépassé.</translation>
+                <translation lang="es_ES">Se ha superado el número máximo de caracteres de una dirección de correo electrónico.</translation>
+            </translations>
+        </property>
+
+        <property key="validationEmailMicroflow" type="microflow" required="false">
+            <caption>Custom validation microflow</caption>
+            <category>Validation</category>
+            <description>Add a microflow that will validate the input. This will be triggered when the content of the input is changed</description>
+            <returnType type="String" />
+        </property>
+
+        <property key="domains" type="object" isList="true" required="false">
+            <caption>Domains</caption>
+            <category>Validation</category>
+            <description>Add the domains that you want to auto-suggest to the user.</description>
+            <properties>
+                <property key="text" type="string">
+                    <caption>Domain</caption>
+                    <category>Validation</category>
+                    <description>Add a domain (for example: gmail.com, yourcompany.com)</description>
+                </property>
+            </properties>
+        </property>
+
+        <property key="topLevelDomains" type="object" isList="true" required="false">
+            <caption>Top level domains</caption>
+            <category>Validation</category>
+            <description>Add the top level domains that you want to auto-suggest to the user.</description>
+            <properties>
+                <property key="text" type="string">
+                    <caption>Top Level Domain</caption>
+                    <category>Validation</category>
+                    <description>Add a top level domain (for example: com, org, net, int, edu, gov, ru, be, nl, en, es)</description>
+                </property>
+            </properties>
+        </property>
+    </properties>
+</widget>
