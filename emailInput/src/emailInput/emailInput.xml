@@ -152,9 +152,9 @@
             <category>Appearance</category>
             <description>Choose a style for an input add-on (only displayed when the input is rendered horizontally)</description>
             <enumerationValues>
-                <enumerationValue key="iconInputGroupAddon">Input icon add-on</enumerationValue>
-                <enumerationValue key="textInputGroupAddon">Input text add-on</enumerationValue>
-                <enumerationValue key="disabledInputGroupAddon">None</enumerationValue>
+                <enumerationValue key="icon">Input icon add-on</enumerationValue>
+                <enumerationValue key="text">Input text add-on</enumerationValue>
+                <enumerationValue key="disabled">None</enumerationValue>
             </enumerationValues>
         </property>
 

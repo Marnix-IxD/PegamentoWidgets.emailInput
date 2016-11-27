@@ -3,6 +3,7 @@ define([
     "mxui/widget/_WidgetBase",
     "mxui/dom",
     "dojo/dom",
+    "dojo/dom-attr",
     "dojo/dom-prop",
     "dojo/dom-geometry",
     "dojo/dom-class",
@@ -15,12 +16,13 @@ define([
     "dojo/_base/event",
     "lib/mailcheck"
 
-], function (declare, _WidgetBase, dom, dojoDom, dojoProp, dojoGeometry, dojoClass, dojoStyle, dojoConstruct, dojoArray, dojoLang, dojoText, dojoHtml, dojoEvent, mailcheck) {
+], function (declare, _WidgetBase, dom, dojoDom, domAttr, dojoProp, dojoGeometry, dojoClass, dojoStyle, domConstruct, dojoArray, dojoLang, dojoText, dojoHtml, dojoEvent, mailcheck) {
     "use strict";
 
-    var add = dojoConstruct.place();
-    var create = dojoConstruct.create();
-    var destroy = dojoConstruct.destroy();
+    var add = domConstruct.place();
+    var create = domConstruct.create();
+    var change =  domAttr.set();
+    var destroy = domConstruct.destroy();
     var hitch = dojoLang.hitch();
 
     return declare("emailInput.widget.emailInput", [ _WidgetBase ], {
@@ -28,16 +30,16 @@ define([
         // Setup internal event binding variables.
         _handles: null,
         _contextObj: null,
+        _uid: "",
 
         // Setup DOM node variables
         _widgetNode: null,
-
         _labelNode: null,
+        _inputGroupNode: null,
         _addonNode: null,
         _inputNode: null,
         _inputValidationMessageNode: null,
         _inputHelperNode: null,
-
         _verificationNode: null,
         _verificationHelperNode: null,
         _verificationValidationMessageNode: null,
@@ -67,7 +69,6 @@ define([
          this.inputHelper
          this.sendEmailVerificationButtonText
 
-
          Validation attributes and microflows:
          this.verificationRequired (verification is required for this input to be valid true/false)
          this.sendEmailVerificationMicroflow (microflow reference which will send a verification to the given email)
@@ -82,70 +83,22 @@ define([
          this.topLevelDomains
          */
 
-
         // Initialize internal widget variables
         constructor: function () {
             this._handles = [];
+            this._uid = _WidgetBase.uniqueid;
         },
 
 
         postCreate: function () {
             logger.debug(this.id + ".postCreate");
-
             // Create the widget DOM
-            if (this.labelStyle === "inputGroupAddon"){
-                this._widgetNode = dom.create(
-                    "div",
-                    {
-                        "class" : "input-group"
-                    },
-                    [dom.create(
-                        "span", {
-                            "id": _WidgetBase.uniqueid + "-label",
-                            "class": "input-group-addon"
-                        },
-                        this.labelText
-                    ),
-                        dom.create(
-                            "input", {
-                                "class": "form-control",
-                                "id": _WidgetBase.uniqueid + "-input",
-                                "type": "email",
-                                "placeholder": this.placeholderText,
-                                "title": this.placeholderText,
-                                "aria-label": this.labelText
-                            }
-                        )]
-                )
-            } else if (this.labelStyle === "inputHTMLLabel") {
-                this._widgetNode = dom.create(
-                    "div",
-                    {
-                        "class": "form-group"
-                    },
-                    [
-                        dom.create(
-                            "label", {
-                                "id": _WidgetBase.uniqueid + "-label",
-                                "for": _WidgetBase.uniqueid + "-input"
-                            },
-                            this.labelText
-                        ),
-                        dom.create(
-                            "input", {
-                                "class": "form-control",
-                                "id": _WidgetBase.uniqueid + "-input",
-                                "type": "email",
-                                "placeholder": this.placeholderText,
-                                "title": this.placeholderText,
-                                "aria-label": this.labelText
-                            }
-                        )]
-                )
-            } else if (this.labelStyle === "inputHTMLLabel"){
+            this._widgetConstructor();
+            this._labelConstructor();
 
-            }
+
             this.domNode.appendChild(_widgetNode);
+            this._updateRendering(callback);
         },
 
         update: function (obj, callback) {
@@ -174,24 +127,99 @@ define([
             this._clearValidations();
         },
 
-        // Create label when enabled
+        /* Widget DOM generation functions
+        ----------------------------------------------------------------------------------------------------------------
+        */
+
+        // Generates <div class="form-group"></div>
+        _widgetConstructor: function(){
+            this._widgetNode = create("div",{"class": "form-group"},this.domNode);
+        },
+
+        // Generates <label id="widgetUniqueID-label" for="widgetUniqueID-input" class="control-label col-width-#-classes">Label text</label>
         _labelConstructor: function(){
             if (this.displayLabel) {
-
+                if (this.formOrientation === "vertical") {
+                    this._labelNode = create("label", {
+                        "id": this._uid + "-label",
+                        "for": this._uid + "-input",
+                        "class": "control-label col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12",
+                        "innerHTML": this.labelText
+                    }, this._widgetNode, "first")
+                } else{
+                    this._labelNode = create("label", {
+                        "id": this._uid + "-label",
+                        "for": this._uid + "-input",
+                        "class": "control-label " + this.labelWidth,
+                        "innerHTML": this.labelText
+                    }, this._widgetNode, "first")
+                }
+            } else {
+                this._labelNode = null;
             }
+        },
+
+        _inputAddonConstructor: function(){
+            if (!this.inputAddon == "disabledInputGroupAddon"){
+                this._inputGroupNode = create("div", {"class":"input-group"},this._widgetNode);
+                if (this.inputAddon === "text") {
+                    this._addonNode = create("span", {
+                        "id": this._uid + "-addon",
+                        "class": "input-group-addon"+ this.inputAddonWidth,
+                        "innerHTML": this.inputAddonText
+                    }, _inputGroupNode, "first");
+                } else if (this.inputAddon === "icon"){
+                    this._addonNode = create("span", {
+                        "id": this._uid + "-addon",
+                        "class": "input-group-addon glyphicon glyphicon-envelope" + this.inputAddonWidth,
+                    }, _inputGroupNode, "first");
+                }
+            } else
+                this._inputGroupNode = null;
+                this._addonNode = null;
+        },
+
+        _inputConstructor: function(){
+            var inputTarget = null;
+            var insertLocation = "";
+            var description = "";
+
+            if (!this.inputAddon == "disabledInputGroupAddon"){
+                inputTarget = this._addonNode;
+                insertLocation = "after";
+            } else {
+                if (this.displayLabel){
+                    inputTarget = this._labelNode;
+                    insertLocation = "after";
+                } else {
+                    inputTarget = this._widgetNode;
+                    insertLocation = "first";
+                }
+            }
+
+            create(
+                "input", {
+                    "class": "form-control",
+                    "id": this._uid + "-input",
+                    "type": "email",
+                    "placeholder": this.placeholderText,
+                    "title": this.placeholderText,
+                    "aria-label": description,
+                    "value": this.emailAddress,
+                }, inputTarget, insertLocation
+            )
         },
 
         // Generic functionality for showing validation messages to the user
         _throwValidationError: function (message) {
             if (this._validationMessageNode !== null) {
-                html.set(this._validationMessageNode, message);
-                return true;
+                change(this._validationMessageNode,"innerHTML", message);
+            } else {
+                this._validationMessageNode = create("div", {
+                    'class': 'alert alert-danger',
+                    'innerHTML': message
+                }, this._inputNode, "after");
             }
-            this._validationMessageNode = create("div", {
-                'class': 'alert alert-danger',
-                'innerHTML': message
-            });
-            add(this.domNode, this._validationMessageNode);
         },
 
         // Validation handling of the input field
